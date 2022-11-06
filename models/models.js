@@ -4,6 +4,7 @@ const { DataTypes } = require("sequelize");
 //birzhan.zhunusbekov@nu.edu.kz jgp4m6c8
 //daulet.maldybayev@nu.edu.kz  rtb5r3pa
 //islam.yerzhanuly@nu.edu.kz   3gvz6eh6
+//ansar.serikbayev@nu.edu.kz rtb5r3pa
 const Doctor = sequelize.define("doctors", {
     id: {
         type: DataTypes.INTEGER,
@@ -95,6 +96,10 @@ const Service = sequelize.define("services", {
         type: DataTypes.INTEGER,
         allowNull: true,
     },
+    duration:{
+        type: DataTypes.INTEGER,
+        defaultValue:30
+    }
 });
 
 const DoctorService = sequelize.define("doctorService", {
