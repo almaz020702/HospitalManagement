@@ -21,7 +21,7 @@ const Doctor = sequelize.define("doctors", {
     middle_name: { type: DataTypes.STRING, allowNull: true },
     contact_number: { type: DataTypes.STRING },
     experience_in_year: { type: DataTypes.INTEGER },
-    photo:{type:DataTypes.STRING},
+    photo: { type: DataTypes.STRING },
     category: {
         type: DataTypes.ENUM(["higher", "first", "second", "third", "nurse"]),
     },
@@ -96,10 +96,10 @@ const Service = sequelize.define("services", {
         type: DataTypes.INTEGER,
         allowNull: true,
     },
-    duration:{
+    duration: {
         type: DataTypes.INTEGER,
-        defaultValue:30
-    }
+        defaultValue: 30,
+    },
 });
 
 const DoctorService = sequelize.define("doctorService", {
@@ -116,9 +116,28 @@ const Appointment = sequelize.define("appointments", {
     },
     name: { type: DataTypes.STRING },
     surname: { type: DataTypes.STRING },
-    completed:{type:DataTypes.BOOLEAN, defaultValue:false},
-    startDate:{type:DataTypes.DATE},
-    endDate:{type:DataTypes.DATE},
+    completed: { type: DataTypes.BOOLEAN, defaultValue: false },
+    startDate: { type: DataTypes.DATE },
+    endDate: { type: DataTypes.DATE },
+});
+
+const Conversation = sequelize.define("conversation", {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+    },
+});
+
+const Message = sequelize.define("messages", {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+    },
+    message: {
+        type: DataTypes.STRING,
+    },
 });
 
 Department.hasMany(Doctor, { onDelete: "SET NULL" });
@@ -130,10 +149,29 @@ Service.belongsToMany(Doctor, { through: DoctorService, onDelete: "CASCADE" });
 Department.hasMany(Service, { onDelete: "CASCADE" });
 Service.belongsTo(Department);
 
-Doctor.hasMany(Appointment)
-Appointment.belongsTo(Doctor)
-Patient.hasMany(Appointment)
-Appointment.belongsTo(Patient)
-Service.hasMany(Appointment)
-Appointment.belongsTo(Service)
-module.exports = { Doctor, Admin, Patient, Department, Service, DoctorService,Appointment };
+Doctor.hasMany(Appointment);
+Appointment.belongsTo(Doctor);
+Patient.hasMany(Appointment);
+Appointment.belongsTo(Patient);
+Service.hasMany(Appointment);
+Appointment.belongsTo(Service);
+
+Doctor.belongsToMany(Patient, { through: Conversation });
+Patient.belongsToMany(Doctor, { through: Conversation });
+
+Doctor.hasMany(Message);
+Message.belongsTo(Doctor);
+Patient.hasMany(Message);
+Message.belongsTo(Patient);
+
+module.exports = {
+    Doctor,
+    Admin,
+    Patient,
+    Department,
+    Service,
+    DoctorService,
+    Appointment,
+    Conversation,
+    Message,
+};

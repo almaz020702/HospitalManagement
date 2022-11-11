@@ -1,4 +1,4 @@
-const { Doctor } = require("../models/models")
+const { Doctor } = require("../../models/models")
 
 class DoctorController{
     async getOne(req,res,next){

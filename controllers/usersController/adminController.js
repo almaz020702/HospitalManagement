@@ -1,5 +1,5 @@
-const ApiError = require("../exceptions/apiError");
-const { Admin, Patient, Doctor } = require("../models/models");
+const ApiError = require("../../exceptions/apiError");
+const { Admin, Patient, Doctor } = require("../../models/models");
 const path = require("path");
 
 class adminController {

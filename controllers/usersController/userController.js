@@ -1,10 +1,10 @@
-const { Patient, Doctor, Admin } = require("../models/models");
+const { Patient, Doctor, Admin } = require("../../models/models");
 const uuid=require('uuid')
 const path=require("path")
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const ApiError = require("../exceptions/apiError");
-const mailService = require("../service/mailService");
+const ApiError = require("../../exceptions/apiError");
+const mailService = require("../../service/mailService");
 
 const generateJWT = (id, email, role) => {
     return jwt.sign({ id, email, role }, process.env.SECRET_KEY, { expiresIn: "24h" });

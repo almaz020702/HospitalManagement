@@ -1,5 +1,5 @@
 const Router=require("express")
-const doctorController = require("../../controllers/doctorController")
+const doctorController = require("../../controllers/usersController/doctorController")
 const router=Router()
 router.get('/',doctorController.getOne)
 
