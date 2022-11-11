@@ -1,7 +1,7 @@
 const sequelize = require("../db");
 const { BadRequest } = require("../exceptions/apiError");
 const ApiError = require("../exceptions/apiError");
-const { Service, Doctor } = require("../models/models");
+const { Service, Doctor, DoctorService } = require("../models/models");
 
 class ServiceController {
     async getAll(req, res, next) {
@@ -9,16 +9,22 @@ class ServiceController {
         return res.json(services);
     }
 
-    async getOne(req,res,next){
+    async getOne(req, res, next) {
         try {
-            const {id}=req.params
-            const service=await Service.findOne({where:{id},include:{model:Doctor, attributes:{include:["name","surname","category","email","id"]}}})
-            if (!service){
-                next(BadRequest("The service with that id does not exist"))
+            const { id } = req.params;
+            const service = await Service.findOne({
+                where: { id },
+                include: {
+                    model: Doctor,
+                    attributes: { include: ["name", "surname", "category", "email", "id"] },
+                },
+            });
+            if (!service) {
+                next(BadRequest("The service with that id does not exist"));
             }
-            return(res.json(service))
+            return res.json(service);
         } catch (error) {
-            next(error)
+            next(error);
         }
     }
     async create(req, res, next) {
@@ -29,17 +35,18 @@ class ServiceController {
                 next(ApiError.BadRequest("The service with this name  already exists"));
             }
 
-            const result = await sequelize.transaction(async (t) => {
+            const result = await sequelize.transaction(async (transaction) => {
                 const service = await Service.create(
                     { service_name, price, departmentId },
-                    { transaction: t }
+                    { transaction }
                 );
-                for (const doctor of doctors) {
-                    await service.addDoctor(await Doctor.findOne({ where: { id: doctor.id } }), {
-                        through: { price: doctor.price },
-                        transaction: t,
-                    });
-                }
+                const data = doctors.map(({ id, price }) => ({
+                    doctorId: id,
+                    price,
+                    serviceId: service.id,
+                }));
+
+                await DoctorService.bulkCreate(data, { transaction });
                 return service;
             });
 
@@ -52,14 +59,14 @@ class ServiceController {
     async delete(req, res, next) {
         try {
             const { id } = req.params;
-            const candidate=await Service.findOne({where:id})
-            if(!candidate){
-                next(ApiError.BadRequest("There is no service with such id"))
+            const candidate = await Service.findOne({ where: id });
+            if (!candidate) {
+                next(ApiError.BadRequest("There is no service with such id"));
             }
-            const deletedCount=await Service.destroy({where:id})
-            return res.json(deletedCount)
+            const deletedCount = await Service.destroy({ where: id });
+            return res.json(deletedCount);
         } catch (error) {
-            next(error)
+            next(error);
         }
     }
 }

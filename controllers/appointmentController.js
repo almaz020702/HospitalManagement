@@ -1,21 +1,27 @@
 const sequelize = require("../db");
 const { QueryTypes } = require("sequelize");
 const appointmentService = require("../service/appointmentService");
+const { Appointment, Service } = require("../models/models");
+const ApiError = require("../exceptions/apiError");
 
 class AppointmentController {
     async availableSlots(req, res, next) {
         try {
             const { date } = req.body;
+            const TZ = 'Asia/Almaty'
             console.log(date);
             const { id } = req.params;
+            console.log(await sequelize.query(`
+            show timezone;
+            `, {type: QueryTypes.SELECT}))
             let allSlots = await sequelize
                 .query(
                     `
             WITH slots as(
                 SELECT *
                 FROM generate_series(
-                        ('${date}'::DATE + interval '8 hours'),
-                        ('${date}'::DATE+ interval '18 hours'),
+                        ('${date}'::DATE + interval '8 hours' ) AT TIME ZONE '${TZ}' ,
+                        ('${date}'::DATE + interval '18 hours' ) AT TIME ZONE '${TZ}' ,
                         INTERVAL '30 minutes'
                     ) as slot
                 order by slot
@@ -54,13 +60,14 @@ class AppointmentController {
     async availableDoctors(req, res, next) {
         try {
             const { time } = req.body;
-            const {id}=req.params
+            const { id } = req.params;
+            const TZ = 'Asia/Almaty'
             const doctors = await sequelize.query(
                 `with slots as(
                 SELECT *
                 FROM generate_series(
-                        '${time}'::DATE + interval '8 hours',
-                        '${time}'::DATE + interval '18 hours',
+                    ('${time}'::DATE + interval '8 hours') AT TIME ZONE '${TZ}',
+                    ('${time}'::DATE + interval '18 hours') AT TIME ZONE '${TZ}',
                         INTERVAL '30 minutes'
                     ) as slot
                 order by slot
@@ -90,12 +97,41 @@ class AppointmentController {
         }
     }
 
-
     async create(req, res, next) {
         try {
-            const {id:serviceId}=req.params
-            
-        } catch (error) {}
+            const { id: serviceId } = req.params;
+            const patientId = req.user.id;
+            const { name, surname, doctorId } = req.body;
+            let { startDate } = req.body;
+            const appointmentExist = await Appointment.findOne({ where: { doctorId, startDate } });
+            if (appointmentExist) {
+                return next(
+                    ApiError.BadRequest(
+                        "the appointment for this doctor at that time already exists"
+                    )
+                );
+            }
+            startDate = new Date(startDate);
+            const { duration } = await Service.findOne({
+                where: { id: serviceId },
+                attributes: ["duration"],
+            });
+            const endDate = new Date(startDate);
+            endDate.setMinutes(endDate.getMinutes() + duration);
+            const appointment = await Appointment.create({
+                name,
+                surname,
+                patientId,
+                doctorId,
+                serviceId,
+                endDate,
+                startDate,
+            });
+            //const appointment=sequelize.query(``,{type:QueryTypes.INSERT})
+            return res.json(appointment);
+        } catch (error) {
+            next(error);
+        }
     }
 }
 
