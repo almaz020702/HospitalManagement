@@ -140,6 +140,16 @@ const Message = sequelize.define("messages", {
     },
 });
 
+const User = sequelize.define("users", {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+    },
+    email: { type: DataTypes.STRING, unique: true },
+    role: { type: DataTypes.ENUM(["patient", "doctor"]) },
+});
+
 Department.hasMany(Doctor, { onDelete: "SET NULL" });
 Doctor.belongsTo(Department);
 
@@ -163,8 +173,8 @@ Doctor.hasMany(Message);
 Message.belongsTo(Doctor);
 Patient.hasMany(Message);
 Message.belongsTo(Patient);
-Conversation.hasMany(Message,{onDelete:"CASCADE"})
-Message.belongsTo(Conversation)
+Conversation.hasMany(Message, { onDelete: "CASCADE" });
+Message.belongsTo(Conversation);
 
 module.exports = {
     Doctor,
@@ -176,4 +186,5 @@ module.exports = {
     Appointment,
     Conversation,
     Message,
+    User,
 };

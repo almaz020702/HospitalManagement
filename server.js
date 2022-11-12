@@ -25,7 +25,7 @@ app.use(errorMiddleware);
 
 
 io.on("connection", function (socket) {
-    socket.join(`${socket.}`)
+   // socket.join(`${socket.}`)
     console.log("A user connected");
     socket.on("chat message", (data) => {
         console.log(socket.id);

@@ -1,6 +1,6 @@
-const { Patient, Doctor, Admin } = require("../../models/models");
-const uuid=require('uuid')
-const path=require("path")
+const { Patient, Doctor, Admin, User } = require("../../models/models");
+const uuid = require("uuid");
+const path = require("path");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const ApiError = require("../../exceptions/apiError");
@@ -27,7 +27,7 @@ class UserController {
                 degree,
                 rating,
                 address,
-                departmentId
+                departmentId,
             } = req.body;
 
             console.log();
@@ -38,9 +38,8 @@ class UserController {
             }
 
             const { photo } = req.files;
-            let fileName=uuid.v4()+".jpg"
-            photo.mv(path.resolve(__dirname,'..','static',fileName))
- 
+            let fileName = uuid.v4() + ".jpg";
+            photo.mv(path.resolve(__dirname, "..", "static", fileName));
 
             const randomPassword = Math.random().toString(36).slice(-8);
             console.log(randomPassword);
@@ -62,8 +61,9 @@ class UserController {
                 address,
                 password: hashPassword,
                 photo: fileName,
-                departmentId
+                departmentId,
             });
+            await User.create({ email, role: "doctor" });
 
             await mailService.sendPasswordMail(email, randomPassword);
             return res.json(user);
@@ -110,6 +110,8 @@ class UserController {
                 marital_status,
                 password: hashPassword,
             });
+
+            await User.create({ email, role: "patient" });
 
             await mailService.sendPasswordMail(email, randomPassword);
             return res.json(user);
