@@ -135,7 +135,7 @@ const Message = sequelize.define("messages", {
         primaryKey: true,
         autoIncrement: true,
     },
-    message: {
+    text: {
         type: DataTypes.STRING,
     },
 });
@@ -163,6 +163,8 @@ Doctor.hasMany(Message);
 Message.belongsTo(Doctor);
 Patient.hasMany(Message);
 Message.belongsTo(Patient);
+Conversation.hasMany(Message,{onDelete:"CASCADE"})
+Message.belongsTo(Conversation)
 
 module.exports = {
     Doctor,

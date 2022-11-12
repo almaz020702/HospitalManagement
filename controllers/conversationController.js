@@ -13,8 +13,11 @@ class ConversationController {
             if (!doctor) {
                 next(ApiError.BadRequest("No doctor with such id"));
             }
-
-            const conversation = await Conversation.create({ doctorId, patientId });
+            let conversation = await Conversation.findOne({where:{patientId,doctorId}})
+            if(conversation){
+                next(ApiError.BadRequest("The conversation already exists"))
+            }
+            conversation = await Conversation.create({ doctorId, patientId });
             res.json(conversation);
         } catch (error) {
             return next(error);
@@ -32,6 +35,22 @@ class ConversationController {
             res.json(conversations);
         } catch (error) {
             return next(error);
+        }
+    }
+    async getConversation(req, res, next) {
+        try {
+            const { id, role } = req.user;
+            const { companionId } = req.params;
+            let conversation;
+            if(role==="patient"){
+                conversation = await Conversation.findOne({ where: { patientId: id ,doctorId:companionId} });
+            }
+            if (role==="doctor") {
+                conversation = await Conversation.findOne({ where: { patientId: companionId ,doctorId:id} });
+            }
+            res.json(conversation);
+        } catch (error) {
+            next(error);
         }
     }
 }
