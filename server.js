@@ -20,7 +20,6 @@ app.use(fileUpload({}));
 app.use(express.static(path.resolve(__dirname, "static")));
 app.use(cors());
 app.use("/api", router);
-app.use(errorMiddleware);
 
 
 
@@ -28,10 +27,10 @@ io.on("connection", function (socket) {
     socket.join(`${socket.user.id}`)
     console.log("A user connected ",socket.user);
     socket.on("chat_message", (data) => {
-        
+        console.log(data.recieverId);
         console.log(socket.id);
         messageService.create(data);
-        socket.to()
+        socket.to(`${data.recieverId}`).emit("chat_message",data.text)
     });
     
     //Whenever someone disconnects this piece of code executed
@@ -41,12 +40,6 @@ io.on("connection", function (socket) {
 });
 
 io.use((socket, next) => {
-    try {
-        
-    } catch (error) {
-        
-    }
-    console.log("kek");
     const authorizationHeader = socket.handshake.headers.authorization;
     if (!authorizationHeader) {
         next(ApiError.BadRequest("No header"));
@@ -60,6 +53,8 @@ io.use((socket, next) => {
     socket.user = decoded;
     next();
 });
+
+app.use(errorMiddleware);
 
 const start = async () => {
     try {

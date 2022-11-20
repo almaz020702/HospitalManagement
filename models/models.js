@@ -1,10 +1,10 @@
 const sequelize = require("../db");
 const { DataTypes } = require("sequelize");
-//angsar.kabdikarim@nu.edu.kz 1f5rfkja
+//angsar.kabdikarim@nu.edu.kz zvn0ux9z
 //birzhan.zhunusbekov@nu.edu.kz jgp4m6c8
 //daulet.maldybayev@nu.edu.kz  rtb5r3pa
 //islam.yerzhanuly@nu.edu.kz   3gvz6eh6
-//ansar.serikbayev@nu.edu.kz kq9yycc9
+//ansar.serikbayev@nu.edu.kz z4b8k08o
 const Doctor = sequelize.define("doctors", {
     id: {
         type: DataTypes.INTEGER,
@@ -166,8 +166,8 @@ Appointment.belongsTo(Patient);
 Service.hasMany(Appointment);
 Appointment.belongsTo(Service);
 
-Doctor.belongsToMany(Patient, { through: Conversation });
-Patient.belongsToMany(Doctor, { through: Conversation });
+User.belongsToMany(User,{as:"first",foreignKey:'firstId',through: Conversation })
+User.belongsToMany(User,{as:"second",foreignKey:'secondId',through: Conversation })
 
 Message.belongsTo(User,{foreignKey:'senderId'});
 Message.belongsTo(User,{foreignKey:'recieverId'});

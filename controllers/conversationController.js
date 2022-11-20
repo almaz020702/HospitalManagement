@@ -1,23 +1,23 @@
 const ApiError = require("../exceptions/apiError");
-const { Patient, Doctor, Conversation } = require("../models/models");
+const { Patient, Doctor, Conversation,User } = require("../models/models");
 
 class ConversationController {
     async create(req, res, next) {
         try {
-            const { patientId, doctorId } = req.body;
-            const patient = await Patient.findOne({ where: { id: patientId } });
-            if (!patient) {
-                next(ApiError.BadRequest("No patient with such id"));
+            const { firstId, secondId } = req.body;
+            const user1 = await User.findOne({ where: { id: firstId } });
+            if (!user1) {
+                next(ApiError.BadRequest("No user with such firstId"));
             }
-            const doctor = await Doctor.findOne({ where: { id: doctorId } });
-            if (!doctor) {
-                next(ApiError.BadRequest("No doctor with such id"));
+            const user2 = await User.findOne({ where: { id: secondId } });
+            if (!user2) {
+                next(ApiError.BadRequest("No user with such secondId"));
             }
-            let conversation = await Conversation.findOne({where:{patientId,doctorId}})
+            let conversation = await Conversation.findOne({where:{firstId,secondId}})
             if(conversation){
                 next(ApiError.BadRequest("The conversation already exists"))
             }
-            conversation = await Conversation.create({ doctorId, patientId });
+            conversation = await Conversation.create({ firstId, secondId });
             res.json(conversation);
         } catch (error) {
             return next(error);
@@ -25,12 +25,12 @@ class ConversationController {
     }
     async getAllofUser(req, res, next) {
         try {
-            const { id, role } = req.user;
+            const { userId, role } = req.user;
             let conversations;
             if (role === "patient") {
-                conversations = await Conversation.findAll({ where: { patientId: id } });
+                conversations = await Conversation.findAll({ where: { firstId: userId } });
             } else if (role === "doctor") {
-                conversations = await Conversation.findAll({ where: { doctorId: id } });
+                conversations = await Conversation.findAll({ where: { secondId: userId } });
             }
             res.json(conversations);
         } catch (error) {
@@ -39,15 +39,8 @@ class ConversationController {
     }
     async getConversation(req, res, next) {
         try {
-            const { id, role } = req.user;
-            const { companionId } = req.params;
-            let conversation;
-            if(role==="patient"){
-                conversation = await Conversation.findOne({ where: { patientId: id ,doctorId:companionId} });
-            }
-            if (role==="doctor") {
-                conversation = await Conversation.findOne({ where: { patientId: companionId ,doctorId:id} });
-            }
+            const { firstId,secondId} = req.user;
+            const conversation = await Conversation.findOne({ where: { firstId ,secondId} });
             res.json(conversation);
         } catch (error) {
             next(error);
