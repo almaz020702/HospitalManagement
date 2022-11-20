@@ -1,5 +1,5 @@
 const ApiError = require("../../exceptions/apiError");
-const { Admin, Patient, Doctor } = require("../../models/models");
+const { Admin, Patient, Doctor,User } = require("../../models/models");
 const path = require("path");
 
 class adminController {
@@ -16,31 +16,18 @@ class adminController {
             next(error);
         }
     }
-    async doctorDelete(req, res, next) {
-        try {
-            const { id } = req.params;
-            const user = await Doctor.findOne({ where: { id } });
-            if (!user) {
-                next(ApiError.BadRequest("There is no user with such id"));
-            }
-            const count = await Doctor.destroy({ where: { id } });
-            return res.json(count);
-        } catch (error) {
-            next(error);
-        }
-    }
 
-    async patientDelete(req, res, next) {
+    async userDelete(req,res,next){
         try {
-            const { id } = req.params;
-            const user = await Patient.findOne({ where: { id } });
-            if (!user) {
+            const {id}=req.params
+            const user=await User.findOne({where:{id}});
+            if(!user){
                 next(ApiError.BadRequest("There is no user with such id"));
             }
-            const count = await Patient.destroy({ where: { id } });
-            return res.json(count);
+            const count=await User.destroy({where:{id}});
+            return res.json(count)
         } catch (error) {
-            next(error);
+            next(error)
         }
     }
 
@@ -55,7 +42,7 @@ class adminController {
             if (req.files) {
                 const { photo } = req.files;
                 const fileName = user.photo;
-                photo.mv(path.resolve(__dirname, "..", "static", fileName));
+                photo.mv(path.resolve(__dirname, "..", "..","static", fileName));
             }
 
             const count = await Doctor.update(req.body, { where: { id } });

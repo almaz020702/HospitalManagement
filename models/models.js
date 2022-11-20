@@ -1,10 +1,10 @@
 const sequelize = require("../db");
 const { DataTypes } = require("sequelize");
-//angsar.kabdikarim@nu.edu.kz t0ffai9e
+//angsar.kabdikarim@nu.edu.kz 1f5rfkja
 //birzhan.zhunusbekov@nu.edu.kz jgp4m6c8
 //daulet.maldybayev@nu.edu.kz  rtb5r3pa
 //islam.yerzhanuly@nu.edu.kz   3gvz6eh6
-//ansar.serikbayev@nu.edu.kz rtb5r3pa
+//ansar.serikbayev@nu.edu.kz kq9yycc9
 const Doctor = sequelize.define("doctors", {
     id: {
         type: DataTypes.INTEGER,
@@ -147,7 +147,7 @@ const User = sequelize.define("users", {
         autoIncrement: true,
     },
     email: { type: DataTypes.STRING, unique: true },
-    role: { type: DataTypes.ENUM(["patient", "doctor"]) },
+    role: { type: DataTypes.ENUM(["patient", "doctor","admin"]) },
 });
 
 Department.hasMany(Doctor, { onDelete: "SET NULL" });
@@ -169,12 +169,17 @@ Appointment.belongsTo(Service);
 Doctor.belongsToMany(Patient, { through: Conversation });
 Patient.belongsToMany(Doctor, { through: Conversation });
 
-Doctor.hasMany(Message);
-Message.belongsTo(Doctor);
-Patient.hasMany(Message);
-Message.belongsTo(Patient);
+Message.belongsTo(User,{foreignKey:'senderId'});
+Message.belongsTo(User,{foreignKey:'recieverId'});
 Conversation.hasMany(Message, { onDelete: "CASCADE" });
 Message.belongsTo(Conversation);
+
+User.hasOne(Doctor,{onDelete: 'CASCADE'});
+Doctor.belongsTo(User);
+User.hasOne(Patient,{onDelete: 'CASCADE'})
+Patient.belongsTo(User)
+User.hasOne(Admin,{onDelete: 'CASCADE'})
+Admin.belongsTo(User)
 
 module.exports = {
     Doctor,
