@@ -25,13 +25,15 @@ app.use(errorMiddleware);
 
 
 io.on("connection", function (socket) {
-   // socket.join(`${socket.}`)
-    console.log("A user connected");
-    socket.on("chat message", (data) => {
+    socket.join(`${socket.user.id}`)
+    console.log("A user connected ",socket.user);
+    socket.on("chat_message", (data) => {
+        
         console.log(socket.id);
         messageService.create(data);
+        socket.to()
     });
-    socket.to()
+    
     //Whenever someone disconnects this piece of code executed
     socket.on("disconnect", function () {
         console.log("A user disconnected");
@@ -39,6 +41,12 @@ io.on("connection", function (socket) {
 });
 
 io.use((socket, next) => {
+    try {
+        
+    } catch (error) {
+        
+    }
+    console.log("kek");
     const authorizationHeader = socket.handshake.headers.authorization;
     if (!authorizationHeader) {
         next(ApiError.BadRequest("No header"));
@@ -50,7 +58,6 @@ io.use((socket, next) => {
 
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
     socket.user = decoded;
-    console.log(socket.user);
     next();
 });
 
