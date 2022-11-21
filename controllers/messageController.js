@@ -1,6 +1,6 @@
 const ApiError = require("../exceptions/apiError")
 const { Conversation, Message } = require("../models/models")
-
+const messageService=require("../service/messageService")
 class MessageController{
     async create(req,res,next){
         const {id}=req.params
@@ -20,7 +20,8 @@ class MessageController{
             if(!conversation){
                 next(ApiError.BadRequest("No conversation with such id"))
             }
-            const messages=await Message.findAll({where:{conversationId:id}})
+            let messages=await Message.findAll({where:{conversationId:id}})
+            messages=await messageService.sortMessages(messages)
             return res.json(messages)
         } catch (error) {
             next(error)

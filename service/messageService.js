@@ -1,5 +1,5 @@
+const  sequelize = require("../db");
 const { Conversation, Message } = require("../models/models");
-
 class MessageService {
     async create(data) {
         try {
@@ -9,11 +9,27 @@ class MessageService {
                 console.log("No conversation with such id");
             }
             const message = await Message.create({ text, senderId, recieverId, conversationId });
-            console.log(message);
+            return message
         } catch (error) {
             console.log(error);
         }
     }
+
+    async sortMessages(messages){
+        try {
+            const sortedMessages=await sequelize.query(`select * from messages 
+                                                        where "conversationId"=${messages.conversationId}
+                                                        order by "createdAt" asc
+            `)
+
+            return sortedMessages
+        } catch (error) {
+            console.log(error)
+        }
+        
+    }
 }
+
+  
 
 module.exports = new MessageService();

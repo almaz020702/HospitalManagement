@@ -29,8 +29,8 @@ io.on("connection", function (socket) {
     socket.on("chat_message", (data) => {
         console.log(data.recieverId);
         console.log(socket.id);
-        messageService.create(data);
-        socket.to(`${data.recieverId}`).emit("chat_message",data.text)
+        const message=messageService.create(data);
+        socket.to(`${data.recieverId}`).emit("chat_message",{message})
     });
     
     //Whenever someone disconnects this piece of code executed
