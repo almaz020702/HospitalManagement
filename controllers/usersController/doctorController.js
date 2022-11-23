@@ -1,4 +1,5 @@
-const { Doctor } = require("../../models/models")
+const ApiError = require("../../exceptions/apiError")
+const { Doctor, Service } = require("../../models/models")
 
 class DoctorController{
     async getOne(req,res,next){
@@ -20,6 +21,22 @@ class DoctorController{
             next(error)
         }
     }
+    async getDoctor(req,res,next){
+        try {
+            const doctorId=req.params.id
+            const doctor=await Doctor.findOne({where:{id:doctorId},include:{
+                model:Service
+            },attributes:{exclude:["password", "createdAt", "updatedAt"]}})
+            if (!doctor){
+                return next(ApiError.BadRequest("No doctor with such id"))
+            }
+            return res.json(doctor)
+        } catch (error) {
+            next(error)
+        }
+    }
 }
+
+
 
 module.exports=new DoctorController()
