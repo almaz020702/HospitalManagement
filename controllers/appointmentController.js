@@ -1,19 +1,24 @@
 const sequelize = require("../db");
 const { QueryTypes } = require("sequelize");
 const appointmentService = require("../service/appointmentService");
-const { Appointment, Service } = require("../models/models");
+const { Appointment, Service,Patient } = require("../models/models");
 const ApiError = require("../exceptions/apiError");
 
 class AppointmentController {
     async availableSlots(req, res, next) {
         try {
             const { date } = req.body;
-            const TZ = 'Asia/Almaty'
+            const TZ = "Asia/Almaty";
             console.log(date);
             const { id } = req.params;
-            console.log(await sequelize.query(`
+            console.log(
+                await sequelize.query(
+                    `
             show timezone;
-            `, {type: QueryTypes.SELECT}))
+            `,
+                    { type: QueryTypes.SELECT }
+                )
+            );
             let allSlots = await sequelize
                 .query(
                     `
@@ -61,7 +66,7 @@ class AppointmentController {
         try {
             const { time } = req.body;
             const { id } = req.params;
-            const TZ = 'Asia/Almaty'
+            const TZ = "Asia/Almaty";
             const doctors = await sequelize.query(
                 `with slots as(
                 SELECT *
@@ -77,7 +82,7 @@ class AppointmentController {
                 where services.id=${id}
             )
             select d.id, d.email, d.name || ' ' || d.surname as "fullName" from doctors as d
-            inner join "doctorServices" as ds on ds."doctorId" = d.id and ds."serviceId" = 10
+            inner join "doctorServices" as ds on ds."doctorId" = d.id and ds."serviceId" = ${id}
             WHERE NOT EXISTS (
                 select 1 from appointments as ap,service_duration
                 WHERE ap."serviceId" = ds."serviceId" AND ap."doctorId" = ds."doctorId"
@@ -100,7 +105,8 @@ class AppointmentController {
     async create(req, res, next) {
         try {
             const { id: serviceId } = req.params;
-            const patientId = req.user.id;
+            console.log(serviceId);
+            const userId = req.user.id;
             const { name, surname, doctorId } = req.body;
             let { startDate } = req.body;
             const appointmentExist = await Appointment.findOne({ where: { doctorId, startDate } });
@@ -118,6 +124,8 @@ class AppointmentController {
             });
             const endDate = new Date(startDate);
             endDate.setMinutes(endDate.getMinutes() + duration);
+            const patient = await Patient.findOne({ where: { userId } });
+            const patientId = patient.id;
             const appointment = await Appointment.create({
                 name,
                 surname,

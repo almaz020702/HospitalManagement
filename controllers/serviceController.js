@@ -29,7 +29,7 @@ class ServiceController {
     }
     async create(req, res, next) {
         try {
-            const { service_name, price, departmentId, doctors } = req.body;
+            const { service_name, price, departmentId, doctors,duration } = req.body;
             const candidate = await Service.findOne({ where: { service_name } });
             if (candidate) {
                 next(ApiError.BadRequest("The service with this name  already exists"));
@@ -37,7 +37,7 @@ class ServiceController {
 
             const result = await sequelize.transaction(async (transaction) => {
                 const service = await Service.create(
-                    { service_name, price, departmentId },
+                    { service_name, price, departmentId,duration },
                     { transaction }
                 );
                 const data = doctors.map(({ id, price }) => ({

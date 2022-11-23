@@ -10,6 +10,16 @@ class DoctorController{
             next (error)
         }
     }
+    async getAll(req,res,next){
+        try {
+            const allDoctors = await Doctor.findAll({
+                attributes: { exclude: ["password", "createdAt", "updatedAt"] },
+            });
+            return res.json(allDoctors)
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 module.exports=new DoctorController()

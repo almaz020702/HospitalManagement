@@ -20,7 +20,7 @@ class MessageController{
             if(!conversation){
                 next(ApiError.BadRequest("No conversation with such id"))
             }
-            let messages=await Message.findAll({where:{conversationId:id}})
+            let messages=await Message.findAll({where:{conversationId:id}, order: [['createdAt'], ['desc']]})
             messages=await messageService.sortMessages(messages)
             return res.json(messages)
         } catch (error) {

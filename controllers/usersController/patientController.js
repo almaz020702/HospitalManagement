@@ -10,6 +10,16 @@ class PatientController{
             next(error)
         }
     }
+    async getAll(req,res,next){
+        try {
+            const allPatients = await Patient.findAll({
+                attributes: { exclude: ["password", "createdAt", "updatedAt"] },
+            });
+            return res.json(allPatients)
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 module.exports=new PatientController()
