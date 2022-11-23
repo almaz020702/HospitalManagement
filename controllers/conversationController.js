@@ -23,9 +23,9 @@ class ConversationController {
             return next(error);
         }
     }
-    async getAllofUser(req, res, next) {
+    async getAllConversations(req, res, next) {
         try {
-            const { userId, role } = req.user;
+            const { id:userId, role } = req.user;
             let conversations;
             if (role === "patient") {
                 conversations = await Conversation.findAll({ where: { firstId: userId } });
@@ -37,10 +37,16 @@ class ConversationController {
             return next(error);
         }
     }
-    async getConversation(req, res, next) {
+    async getOneConversation(req, res, next) {
         try {
-            const { firstId,secondId} = req.user;
-            const conversation = await Conversation.findOne({ where: { firstId ,secondId} });
+            const {companionId}=req.params
+            const { id:userId,role} = req.user;
+            let conversation
+            if(role=="patient"){
+                conversation=await Conversation.findOne({where:{firstId:userId,secondId:companionId}})                
+            }else if(role=="doctor"){
+                conversation = await Conversation.findOne({ where: { firstId:companionId ,secondId:userId} });
+            }
             res.json(conversation);
         } catch (error) {
             next(error);

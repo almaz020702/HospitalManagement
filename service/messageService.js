@@ -15,7 +15,7 @@ class MessageService {
         }
     }
 
-    async sortMessages(messages){
+   /* async sortMessages(messages){
         try {
             const sortedMessages=await sequelize.query(`select * from messages 
                                                         where "conversationId"=${messages.conversationId}
@@ -27,7 +27,7 @@ class MessageService {
             console.log(error)
         }
         
-    }
+    }*/
 }
 
   
