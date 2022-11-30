@@ -1,7 +1,7 @@
 const sequelize = require("../db");
 const { QueryTypes } = require("sequelize");
 const appointmentService = require("../service/appointmentService");
-const { Appointment, Service,Patient } = require("../models/models");
+const { Appointment, Service, Patient, Doctor } = require("../models/models");
 const ApiError = require("../exceptions/apiError");
 
 class AppointmentController {
@@ -137,6 +137,36 @@ class AppointmentController {
             });
             //const appointment=sequelize.query(``,{type:QueryTypes.INSERT})
             return res.json(appointment);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async getAll(req, res, next) {
+        try {
+            const { id, role } = req.user;
+            let user, appointments;
+            if (role === "doctor") {
+                user = await Doctor.findOne({ where: { userId: id } });
+                appointments = await Appointment.findAll({ where: { doctorId: user.id } });
+            } else if (role === "patient") {
+                user = await Patient.findOne({ where: { userId: id } });
+                appointments = await Appointment.findAll({
+                    where: { patientId: user.id },
+                    include: [
+                        {
+                            model: Doctor,
+                            attributes: { exclude: ["password", "createdAt", "updatedAt"] },
+                        },
+                        {
+                            model: Service,
+                            attributes: { exclude: ["createdAt","updatedAt"] },
+                        },
+                    ],
+                    attributes:{exclude:['doctorId','serviceId']}
+                });
+            }
+            res.json(appointments);
         } catch (error) {
             next(error);
         }
