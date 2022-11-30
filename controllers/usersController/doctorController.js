@@ -1,5 +1,5 @@
 const ApiError = require("../../exceptions/apiError");
-const { Doctor, Service, Patient } = require("../../models/models");
+const { Doctor, Service, Patient, Appointment } = require("../../models/models");
 
 class DoctorController {
     async getOne(req, res, next) {
@@ -7,7 +7,10 @@ class DoctorController {
             const { email } = req.user;
             const doctor = await Doctor.findOne({
                 where: { email },
-                include: Patient,
+                include: {
+                    model:Appointment,
+                    include:Patient
+                },
                 attributes: { exclude: ["password"] },
             });
             return res.json(doctor);

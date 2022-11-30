@@ -178,8 +178,6 @@ Doctor.hasMany(Appointment);
 Appointment.belongsTo(Doctor);
 Patient.hasMany(Appointment);
 Appointment.belongsTo(Patient);
-
-
 Service.hasMany(Appointment);
 Appointment.belongsTo(Service);
 
