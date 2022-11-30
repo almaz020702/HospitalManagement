@@ -5,7 +5,7 @@ class PatientController{
         try {
             const {email}=req.user
             const patient=await Patient.findOne({where:{email},attributes:{exclude:["password"]}})
-            return res.json(patient) 
+            return res.json([patient]) 
         } catch (error) {
             next(error)
         }

@@ -1,10 +1,10 @@
 const sequelize = require("../db");
 const { DataTypes } = require("sequelize");
-//angsar.kabdikarim@nu.edu.kz zvn0ux9z
+//angsar.kabdikarim@nu.edu.kz pd1snv1e
 //birzhan.zhunusbekov@nu.edu.kz jgp4m6c8
 //daulet.maldybayev@nu.edu.kz  rtb5r3pa
 //islam.yerzhanuly@nu.edu.kz   3gvz6eh6
-//ansar.serikbayev@nu.edu.kz z4b8k08o
+//ansar.serikbayev@nu.edu.kz 7iokz6ae
 const Doctor = sequelize.define("doctors", {
     id: {
         type: DataTypes.INTEGER,
@@ -147,7 +147,22 @@ const User = sequelize.define("users", {
         autoIncrement: true,
     },
     email: { type: DataTypes.STRING, unique: true },
-    role: { type: DataTypes.ENUM(["patient", "doctor","admin"]) },
+    role: { type: DataTypes.ENUM(["patient", "doctor", "admin"]) },
+});
+
+const Treatment = sequelize.define("treatments", {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+    },
+    text: {
+        type: DataTypes.TEXT,
+    },
+    completed: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+    }
 });
 
 Department.hasMany(Doctor, { onDelete: "SET NULL" });
@@ -163,23 +178,32 @@ Doctor.hasMany(Appointment);
 Appointment.belongsTo(Doctor);
 Patient.hasMany(Appointment);
 Appointment.belongsTo(Patient);
+
+
 Service.hasMany(Appointment);
 Appointment.belongsTo(Service);
 
-User.belongsToMany(User,{as:"first",foreignKey:'firstId',through: Conversation })
-User.belongsToMany(User,{as:"second",foreignKey:'secondId',through: Conversation })
+User.belongsToMany(User, { as: "first", foreignKey: "firstId", through: Conversation });
+User.belongsToMany(User, { as: "second", foreignKey: "secondId", through: Conversation });
 
-Message.belongsTo(User,{foreignKey:'senderId'});
-Message.belongsTo(User,{foreignKey:'recieverId'});
+Message.belongsTo(User, { foreignKey: "senderId" });
+Message.belongsTo(User, { foreignKey: "recieverId" });
 Conversation.hasMany(Message, { onDelete: "CASCADE" });
 Message.belongsTo(Conversation);
 
-User.hasOne(Doctor,{onDelete: 'CASCADE'});
+User.hasOne(Doctor, { onDelete: "CASCADE" });
 Doctor.belongsTo(User);
-User.hasOne(Patient,{onDelete: 'CASCADE'})
-Patient.belongsTo(User)
-User.hasOne(Admin,{onDelete: 'CASCADE'})
-Admin.belongsTo(User)
+User.hasOne(Patient, { onDelete: "CASCADE" });
+Patient.belongsTo(User);
+User.hasOne(Admin, { onDelete: "CASCADE" });
+Admin.belongsTo(User);
+
+Doctor.belongsToMany(Patient, { through: Treatment });
+Patient.belongsToMany(Doctor, { through:  Treatment });
+Doctor.hasMany(Treatment);
+Treatment.belongsTo(Doctor);
+Patient.hasMany(Treatment);
+Treatment.belongsTo(Patient);
 
 module.exports = {
     Doctor,
@@ -192,4 +216,5 @@ module.exports = {
     Conversation,
     Message,
     User,
+    Treatment
 };
