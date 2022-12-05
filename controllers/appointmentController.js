@@ -149,7 +149,7 @@ class AppointmentController {
             if (role === "doctor") {
                 user = await Doctor.findOne({ where: { userId: id } });
                 appointments = await Appointment.findAll({
-                    where: { doctorId: user.id },
+                    where: { doctorId: user.id, completed: "false" },
                     include: [
                         {
                             model: Patient,
@@ -166,7 +166,7 @@ class AppointmentController {
             } else if (role === "patient") {
                 user = await Patient.findOne({ where: { userId: id } });
                 appointments = await Appointment.findAll({
-                    where: { patientId: user.id },
+                    where: { patientId: user.id, completed: "false" },
                     include: [
                         {
                             model: Doctor,
@@ -181,7 +181,43 @@ class AppointmentController {
                     order: [["createdAt", "ASC"]],
                 });
             }
-            res.json(appointments);
+            return res.json(appointments);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async getHistory(req, res, next) {
+        try {
+            const { id } = req.user;
+            const patient = await Patient.findOne({ where: { userId: id } });
+            const appointments = await Appointment.findAll({
+                where: { patientId: patient.id, completed: "true" },
+                include: [
+                    {
+                        model: Doctor,
+                        attributes: { exclude: ["password", "createdAt", "updatedAt"] },
+                    },
+                    {
+                        model: Service,
+                        attributes: { exclude: ["createdAt", "updatedAt"] },
+                    },
+                ],
+                attributes: { exclude: ["doctorId", "serviceId"] },
+                order: [["startDate", "DESC"]],
+            });
+            return res.json(appointments);
+        } catch (error) {
+            next(error);
+        }
+    }
+    async changeStatus(req, res, next) {
+        try {
+            const { id } = req.params;
+            const appointment = await Appointment.findOne({ where: { id } });
+            appointment.completed = "true";
+            await appointment.save();
+            return res.json("changed");
         } catch (error) {
             next(error);
         }

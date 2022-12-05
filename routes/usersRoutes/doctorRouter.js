@@ -6,4 +6,5 @@ const router=Router()
 router.get('/',doctorController.getOne)
 router.post('/treatment/:id',treatmentController.create)
 router.get('/appointment',appointmentController.getAll)
+router.patch('/appointment/:id/statusChange',appointmentController.changeStatus)
 module.exports=router
