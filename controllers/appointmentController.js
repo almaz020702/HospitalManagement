@@ -161,6 +161,7 @@ class AppointmentController {
                         },
                     ],
                     attributes: { exclude: ["patientId", "serviceId"] },
+                    order: [["createdAt", "ASC"]],
                 });
             } else if (role === "patient") {
                 user = await Patient.findOne({ where: { userId: id } });
@@ -177,6 +178,7 @@ class AppointmentController {
                         },
                     ],
                     attributes: { exclude: ["doctorId", "serviceId"] },
+                    order: [["createdAt", "ASC"]],
                 });
             }
             res.json(appointments);

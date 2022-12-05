@@ -9,5 +9,6 @@ router.get('/',patientController.getOne)
 router.get('/appointment',appointmentController.getAll)
 router.get('/treatment',treatmentController.getAll)
 router.patch('/treatment/:id/statusChange',treatmentController.changeStatus)
+router.get('/treatment/history',treatmentController.getHistory)
 
 module.exports=router
