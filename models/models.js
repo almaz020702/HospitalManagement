@@ -196,8 +196,6 @@ Patient.belongsTo(User);
 User.hasOne(Admin, { onDelete: "CASCADE" });
 Admin.belongsTo(User);
 
-Doctor.belongsToMany(Patient, { through: Treatment });
-Patient.belongsToMany(Doctor, { through:  Treatment });
 Doctor.hasMany(Treatment);
 Treatment.belongsTo(Doctor);
 Patient.hasMany(Treatment);
