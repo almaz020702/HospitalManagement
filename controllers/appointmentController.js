@@ -148,7 +148,20 @@ class AppointmentController {
             let user, appointments;
             if (role === "doctor") {
                 user = await Doctor.findOne({ where: { userId: id } });
-                appointments = await Appointment.findAll({ where: { doctorId: user.id } });
+                appointments = await Appointment.findAll({
+                    where: { doctorId: user.id },
+                    include: [
+                        {
+                            model: Patient,
+                            attributes: { exclude: ["password", "createdAt", "updatedAt"] },
+                        },
+                        {
+                            model: Service,
+                            attributes: { exclude: ["createdAt", "updatedAt"] },
+                        },
+                    ],
+                    attributes: { exclude: ["patientId", "serviceId"] },
+                });
             } else if (role === "patient") {
                 user = await Patient.findOne({ where: { userId: id } });
                 appointments = await Appointment.findAll({
@@ -160,10 +173,10 @@ class AppointmentController {
                         },
                         {
                             model: Service,
-                            attributes: { exclude: ["createdAt","updatedAt"] },
+                            attributes: { exclude: ["createdAt", "updatedAt"] },
                         },
                     ],
-                    attributes:{exclude:['doctorId','serviceId']}
+                    attributes: { exclude: ["doctorId", "serviceId"] },
                 });
             }
             res.json(appointments);

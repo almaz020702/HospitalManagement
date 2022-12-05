@@ -59,11 +59,11 @@ class ServiceController {
     async delete(req, res, next) {
         try {
             const { id } = req.params;
-            const candidate = await Service.findOne({ where: id });
+            const candidate = await Service.findOne({ where: {id} });
             if (!candidate) {
                 next(ApiError.BadRequest("There is no service with such id"));
             }
-            const deletedCount = await Service.destroy({ where: id });
+            const deletedCount = await Service.destroy({ where: {id} });
             return res.json(deletedCount);
         } catch (error) {
             next(error);

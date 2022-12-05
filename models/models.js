@@ -181,8 +181,8 @@ Appointment.belongsTo(Patient);
 Service.hasMany(Appointment);
 Appointment.belongsTo(Service);
 
-User.belongsToMany(User, { as: "first", foreignKey: "firstId", through: Conversation });
-User.belongsToMany(User, { as: "second", foreignKey: "secondId", through: Conversation });
+User.belongsToMany(User, { as: "first", foreignKey: "firstId", through: Conversation });    //patient
+User.belongsToMany(User, { as: "second", foreignKey: "secondId", through: Conversation }); ///doctor
 
 Message.belongsTo(User, { foreignKey: "senderId" });
 Message.belongsTo(User, { foreignKey: "recieverId" });

@@ -13,7 +13,7 @@ class DoctorController {
                 },
                 attributes: { exclude: ["password"] },
             });
-            return res.json(doctor);
+            return res.json([doctor]);
         } catch (error) {
             next(error);
         }
